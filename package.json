@@ -1,0 +1,15 @@
+{
+	"name": "symlink-test",
+	"private": true,
+	"scripts": {
+		"dependencies": "nudeps",
+		"prepare": "nudeps"
+	},
+	"dependencies": {
+		"open-props": "^1.7.23"
+	},
+	"devDependencies": {
+		"nudeps": "^0.4.1"
+	},
+	"type": "module"
+}

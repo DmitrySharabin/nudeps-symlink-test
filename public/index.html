@@ -54,6 +54,27 @@
 		</li>
 	</ul>
 
+	<h2>Alias created by nudeps during the host build</h2>
+	<p>
+		<code>nudeps/open-props</code> is an alias nudeps creates for <code>nudeps/open-props@1.7.23</code>.
+		Neither is committed.
+	</p>
+
+	<ul>
+		<li data-url="importmap.js" data-expect="Nudeps v">
+			nudeps ran on the host: <code>importmap.js</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="nudeps/open-props@1.7.23/open-props.min.css" data-expect="--font-sans">
+			Control, the versioned folder: <code>nudeps/open-props@1.7.23/open-props.min.css</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="nudeps/open-props/open-props.min.css" data-expect="--font-sans">
+			The test, through the alias: <code>nudeps/open-props/open-props.min.css</code>
+			<output>checking…</output>
+		</li>
+	</ul>
+
 	<script type="module">
 		for (let item of document.querySelectorAll("li[data-url]")) {
 			let output = item.querySelector("output");
