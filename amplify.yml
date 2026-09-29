@@ -1,0 +1,10 @@
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - ls -la public/client_modules
+  artifacts:
+    baseDirectory: public
+    files:
+      - "**/*"
