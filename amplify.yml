@@ -1,0 +1,11 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Runs nudeps through its dependencies/prepare hooks
+        - npm ci
+  artifacts:
+    baseDirectory: public
+    files:
+      - "**/*"
