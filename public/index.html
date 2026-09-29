@@ -35,15 +35,38 @@
 </head>
 <body>
 	<h1>Does this host serve directory symlinks?</h1>
+
+	<h2>Symlink committed to git</h2>
 	<p><code>client_modules/foo</code> is a symlink to <code>client_modules/foo@1.0.0</code>.</p>
 
 	<ul>
-		<li data-url="client_modules/foo@1.0.0/index.js">
+		<li data-url="client_modules/foo@1.0.0/index.js" data-expect="foo 1.0.0">
 			Control, the real folder: <code>client_modules/foo@1.0.0/index.js</code>
 			<output>checking…</output>
 		</li>
-		<li data-url="client_modules/foo/index.js">
+		<li data-url="client_modules/foo/index.js" data-expect="foo 1.0.0">
 			The test, through the symlink: <code>client_modules/foo/index.js</code>
+			<output>checking…</output>
+		</li>
+	</ul>
+
+	<h2>Alias created by nudeps during the host build</h2>
+	<p>
+		<code>nudeps/open-props</code> is an alias nudeps creates for <code>nudeps/open-props@1.7.23</code>.
+		Neither is committed.
+	</p>
+
+	<ul>
+		<li data-url="importmap.js" data-expect="Nudeps v">
+			nudeps ran on the host: <code>importmap.js</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="nudeps/open-props@1.7.23/open-props.min.css" data-expect="--font-sans">
+			Control, the versioned folder: <code>nudeps/open-props@1.7.23/open-props.min.css</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="nudeps/open-props/open-props.min.css" data-expect="--font-sans">
+			The test, through the alias: <code>nudeps/open-props/open-props.min.css</code>
 			<output>checking…</output>
 		</li>
 	</ul>
@@ -56,7 +79,7 @@
 				let response = await fetch(item.dataset.url, { cache: "no-store" });
 				let text = await response.text();
 				// A host may answer 200 with an HTML fallback page, so check the content too
-				let ok = response.ok && text.includes("foo 1.0.0");
+				let ok = response.ok && text.includes(item.dataset.expect);
 				item.classList.add(ok ? "pass" : "fail");
 				output.textContent = `${ok ? "PASS" : "FAIL"} (HTTP ${response.status}${response.redirected ? ", redirected" : ""})`;
 			}
