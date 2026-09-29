@@ -1,9 +1,13 @@
 version: 1
 frontend:
   phases:
+    preBuild:
+      commands:
+        # Runs nudeps through its dependencies/prepare hooks
+        - npm ci
     build:
       commands:
-        - ls -la public/client_modules
+        - ls -la public/client_modules public/nudeps
   artifacts:
     baseDirectory: public
     files:
