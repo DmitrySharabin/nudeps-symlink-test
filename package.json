@@ -2,7 +2,7 @@
 	"name": "symlink-test",
 	"private": true,
 	"scripts": {
-		"build": "echo built",
+		"build": "node build.js",
 		"dependencies": "nudeps",
 		"prepare": "nudeps"
 	},
