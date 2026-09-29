@@ -3,8 +3,7 @@
 	"private": true,
 	"scripts": {
 		"dependencies": "nudeps",
-		"prepare": "nudeps",
-		"build": "nudeps"
+		"prepare": "nudeps"
 	},
 	"dependencies": {
 		"open-props": "^1.7.23"
