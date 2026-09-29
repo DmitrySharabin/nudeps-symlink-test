@@ -3,18 +3,36 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Symlink test</title>
+	<title>Open Props • Nudeps on this host</title>
+
+	<!-- Neither file is committed: nudeps creates both during the host build -->
+	<link rel="stylesheet" href="nudeps/open-props/open-props.min.css" />
+	<script src="importmap.js"></script>
+
 	<style>
 		body {
-			font-family: system-ui, sans-serif;
+			font-family: var(--font-sans, serif);
 			max-inline-size: 40rem;
 			margin-inline: auto;
-			padding: 1.5rem;
+			padding: var(--size-5, 1rem);
+			color: var(--gray-9);
 		}
 
+		h1 {
+			color: var(--indigo-7);
+		}
+
+		.card {
+			padding: var(--size-4);
+			border-radius: var(--radius-3);
+			box-shadow: var(--shadow-3);
+			background: var(--gray-0);
+		}
+
+		/* Plain colors, so the verdict stays readable when Open Props fails to load */
 		li {
-			margin-block: 0.75em;
-			padding: 0.75em 1em;
+			margin-block: 0.5em;
+			padding: 0.5em 1em;
 			border-radius: 0.5em;
 			background: oklch(95% 0 0);
 			list-style: none;
@@ -28,69 +46,90 @@
 			}
 		}
 
+		ul {
+			padding: 0;
+		}
+
 		output {
 			font-weight: bold;
+		}
+
+		.gradient-box {
+			block-size: var(--size-10);
+			background: var(--gradient-12);
+			border-radius: var(--radius-3);
+			animation: var(--animation-fade-in);
+		}
+
+		.swatches {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--size-2);
+			margin-block-start: var(--size-3);
+		}
+
+		.swatch {
+			inline-size: var(--size-8);
+			block-size: var(--size-8);
+			border-radius: var(--radius-2);
+			box-shadow: var(--shadow-2);
+		}
+
+		code {
+			background: var(--gray-2);
+			padding: var(--size-1) var(--size-2);
+			border-radius: var(--radius-2);
+			font-size: var(--font-size-1);
 		}
 	</style>
 </head>
 <body>
-	<h1>Does this host serve directory symlinks?</h1>
-
-	<h2>Symlink committed to git</h2>
-	<p><code>client_modules/foo</code> is a symlink to <code>client_modules/foo@1.0.0</code>.</p>
+	<h1>Open Props, installed by nudeps on this host</h1>
 
 	<ul>
-		<li data-url="client_modules/foo@1.0.0/index.js" data-expect="foo 1.0.0">
-			Control, the real folder: <code>client_modules/foo@1.0.0/index.js</code>
+		<li id="css">
+			CSS through the nudeps alias <code>nudeps/open-props/</code>
 			<output>checking…</output>
 		</li>
-		<li data-url="client_modules/foo/index.js" data-expect="foo 1.0.0">
-			The test, through the symlink: <code>client_modules/foo/index.js</code>
-			<output>checking…</output>
-		</li>
-		<li data-url="client_modules/outside/index.js" data-expect="outside">
-			A symlink to a folder outside <code>public/</code>: <code>client_modules/outside -> ../../lib</code>
+		<li id="js">
+			JS through the import map: <code>import props from "open-props"</code>
 			<output>checking…</output>
 		</li>
 	</ul>
 
-	<h2>Alias created by nudeps during the host build</h2>
-	<p>
-		<code>nudeps/open-props</code> is an alias nudeps creates for <code>nudeps/open-props@1.7.23</code>.
-		Neither is committed.
-	</p>
+	<div class="card">
+		<p>The gradient needs the CSS. The swatches are built from the imported JS.</p>
+		<div class="gradient-box"></div>
+		<div class="swatches"></div>
+	</div>
 
-	<ul>
-		<li data-url="importmap.js" data-expect="Nudeps v">
-			nudeps ran on the host: <code>importmap.js</code>
-			<output>checking…</output>
-		</li>
-		<li data-url="nudeps/open-props@1.7.23/open-props.min.css" data-expect="--font-sans">
-			Control, the versioned folder: <code>nudeps/open-props@1.7.23/open-props.min.css</code>
-			<output>checking…</output>
-		</li>
-		<li data-url="nudeps/open-props/open-props.min.css" data-expect="--font-sans">
-			The test, through the alias: <code>nudeps/open-props/open-props.min.css</code>
-			<output>checking…</output>
-		</li>
-	</ul>
+	<p><a href="checks.html">Detailed symlink checks</a></p>
 
 	<script type="module">
-		for (let item of document.querySelectorAll("li[data-url]")) {
-			let output = item.querySelector("output");
+		function report (id, ok, detail) {
+			let item = document.getElementById(id);
+			item.classList.add(ok ? "pass" : "fail");
+			item.querySelector("output").textContent = `${ok ? "PASS" : "FAIL"} (${detail})`;
+		}
 
-			try {
-				let response = await fetch(item.dataset.url, { cache: "no-store" });
-				let text = await response.text();
-				// A host may answer 200 with an HTML fallback page, so check the content too
-				let ok = response.ok && text.includes(item.dataset.expect);
-				item.classList.add(ok ? "pass" : "fail");
-				output.textContent = `${ok ? "PASS" : "FAIL"} (HTTP ${response.status}${response.redirected ? ", redirected" : ""})`;
+		let indigo = getComputedStyle(document.body).getPropertyValue("--indigo-7");
+		report("css", indigo !== "", indigo ? `--indigo-7 is ${indigo}` : "Open Props did not load");
+
+		try {
+			let { default: props } = await import("open-props");
+			let hues = ["red", "orange", "yellow", "green", "cyan", "blue", "indigo", "violet", "purple", "pink"];
+
+			for (let hue of hues) {
+				let swatch = document.createElement("div");
+				swatch.className = "swatch";
+				swatch.style.background = props[`--${hue}-5`];
+				document.querySelector(".swatches").append(swatch);
 			}
-			catch (error) {
-				item.classList.add("fail");
-				output.textContent = `FAIL (${error.message})`;
-			}
+
+			report("js", true, `${Object.keys(props).length} props imported`);
+		}
+		catch (error) {
+			report("js", false, error.message);
 		}
 	</script>
 </body>
