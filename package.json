@@ -4,7 +4,7 @@
 	"scripts": {
 		"dependencies": "nudeps",
 		"prepare": "nudeps",
-		"build": "nudeps"
+		"vercel-build": "nudeps"
 	},
 	"dependencies": {
 		"open-props": "^1.7.23"
