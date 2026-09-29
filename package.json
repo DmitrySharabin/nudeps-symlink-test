@@ -2,7 +2,6 @@
 	"name": "symlink-test",
 	"private": true,
 	"scripts": {
-		"build": "node build.js",
 		"dependencies": "nudeps",
 		"prepare": "nudeps"
 	},
