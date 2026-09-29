@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Symlink test</title>
+	<style>
+		body {
+			font-family: system-ui, sans-serif;
+			max-inline-size: 40rem;
+			margin-inline: auto;
+			padding: 1.5rem;
+		}
+
+		li {
+			margin-block: 0.75em;
+			padding: 0.75em 1em;
+			border-radius: 0.5em;
+			background: oklch(95% 0 0);
+			list-style: none;
+
+			&.pass {
+				background: oklch(90% 0.1 145);
+			}
+
+			&.fail {
+				background: oklch(88% 0.1 25);
+			}
+		}
+
+		output {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1>Does this host serve directory symlinks?</h1>
+
+	<h2>Symlink committed to git</h2>
+	<p><code>client_modules/foo</code> is a symlink to <code>client_modules/foo@1.0.0</code>.</p>
+
+	<ul>
+		<li data-url="client_modules/foo@1.0.0/index.js" data-expect="foo 1.0.0">
+			Control, the real folder: <code>client_modules/foo@1.0.0/index.js</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="client_modules/foo/index.js" data-expect="foo 1.0.0">
+			The test, through the symlink: <code>client_modules/foo/index.js</code>
+			<output>checking…</output>
+		</li>
+		<li data-url="client_modules/outside/index.js" data-expect="outside">
+			A symlink to a folder outside <code>public/</code>: <code>client_modules/outside -> ../../lib</code>
+			<output>checking…</output>
+		</li>
+	</ul>
+
+	<script type="module">
+		for (let item of document.querySelectorAll("li[data-url]")) {
+			let output = item.querySelector("output");
+
+			try {
+				let response = await fetch(item.dataset.url, { cache: "no-store" });
+				let text = await response.text();
+				// A host may answer 200 with an HTML fallback page, so check the content too
+				let ok = response.ok && text.includes(item.dataset.expect);
+				item.classList.add(ok ? "pass" : "fail");
+				output.textContent = `${ok ? "PASS" : "FAIL"} (HTTP ${response.status}${response.redirected ? ", redirected" : ""})`;
+			}
+			catch (error) {
+				item.classList.add("fail");
+				output.textContent = `FAIL (${error.message})`;
+			}
+		}
+	</script>
+</body>
+</html>
