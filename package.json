@@ -10,7 +10,7 @@
 		"open-props": "^1.7.23"
 	},
 	"devDependencies": {
-		"nudeps": "github:nudeps/nudeps"
+		"nudeps": "github:nudeps/nudeps#cloudflare-pages"
 	},
 	"type": "module"
 }
